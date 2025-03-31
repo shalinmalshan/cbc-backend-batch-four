@@ -5,10 +5,11 @@ import userRouter from './Routes/userRouter.js';
 import productRouter from './Routes/producrRouter.js';
 import verifyJWT from './middleWare/verifyJwt.js';
 import orderRouter from './Routes/orderRouter.js';
-
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
-mongoose.connect("mongodb+srv://admin:123@cluster0.cnart.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").then(
+mongoose.connect(process.env.MONGO_URL).then(
     () => {
         console.log("connected to the database");
     }
