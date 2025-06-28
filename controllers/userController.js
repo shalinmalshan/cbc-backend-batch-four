@@ -5,14 +5,14 @@ import dotenv from "dotenv"
 import axios from "axios";
 dotenv.config()
 export function saveUser(req, res) {
-    if (req.body.role == "admin") {
+    if (req.body.role == "superadmin") {
         if (req.user == null) {
             res.status(403).json({
-                message: "please login as admin before creating an as admin account"
+                message: "please login as super admin before creating an as admin account"
             })
             return
         }
-        if (req.user.role != "admin") {
+        if (req.user.role != "superadmin") {
             res.status(403).json({
                 message: "you are not authorized to create an admin account"
             })
@@ -28,7 +28,7 @@ export function saveUser(req, res) {
         lastName: req.body.lastName,
         password: hashedPassword,
         role: req.body.role
-    })
+    }) 
 
 
     user.save().then(() => {
@@ -158,4 +158,112 @@ export async function googleLogin(req, res) {
         )
     }
 
+}
+
+export function getUsers(req,res){
+    if (req.user == null){
+        res.status(403).json({
+            message: "You need to login first"
+        })
+        return;
+    }
+     if(req.user.isDisabled){
+        res.status(403).json({
+            message: "Your account is disabled"
+        })
+        return;
+
+    }
+
+    if( req.user.role !=="superadmin" && req.user.role !=="admin"){
+        res.status(403).json({
+            message:"You are not authorized to get users"
+        })
+        return;
+    }
+   User.find().then(
+    (users)=>{
+        res.json(users)
+    }
+   ).catch(
+    ()=>{
+        res.status(500).json({
+            message:"users not found"
+        })
+    }
+   )
+}
+
+export  function updateUserRole(req, res) {
+    if (req.user == null) {
+        res.status(403).json({
+            message: "You need to login first"
+        })
+        return;
+    }
+    if(req.user.isDisabled){
+        res.status(403).json({
+            message: "Your account is disabled"
+        })
+        return;
+    }
+    if (req.user.role != "superadmin") {
+        res.status(403).json({
+            message: "You are not authorized to update a user"
+        })
+        return;
+    }
+     User.findOneAndUpdate({
+        email: req.params.email
+    }, req.body).then(
+        ()=>{
+            res.json({
+                message:"User updated successfully"
+            })
+        }
+    ).catch(
+        (err)=>{
+            res.status(500).json({
+                message: "User not updated"
+            })
+        }
+    )
+}
+
+export function deleteUser(req,res){
+    if (req.user == null) {
+        res.status(403).json({
+            message: "You need to login first"
+        })
+        return;
+    }
+    if(req.user.isDisabled){
+        res.status(403).json({
+            message: "Your account is disabled"
+        })
+        return;
+
+    }
+    if (req.user.role != "superadmin") {
+        res.status(403).json({
+            message: "You are not authorized to delete a user"
+        })
+        return;
+    }
+
+    User.findOneAndDelete({
+        email: req.params.email
+    }).then(
+        ()=>{
+            res.json({
+                message:"User deleted successfully"
+            })
+        }
+    ).catch(
+        (err)=>{
+            res.status(500).json({
+                message: "User not deleted"
+            })
+        }
+    )
 }

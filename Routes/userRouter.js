@@ -1,9 +1,12 @@
 import express from "express";
-import { googleLogin, loginUser, saveUser } from "../controllers/userController.js";
+import { deleteUser, getUsers, googleLogin, loginUser, saveUser, updateUserRole } from "../controllers/userController.js";
 
 const userRouter= express.Router();
 
 userRouter.post("/",saveUser)
 userRouter.post("/login",loginUser)
 userRouter.post("/google",googleLogin)
+userRouter.get("/",getUsers)
+userRouter.put("/role/:email",updateUserRole)
+userRouter.delete("/:email",deleteUser)
 export default userRouter
