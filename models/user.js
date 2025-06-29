@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     },
     lastName: {
         type: String,
-        required: true
+        required: false
     },
     role: {
         type: String,
@@ -37,6 +37,11 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    profilePicture:{
+        type: String,
+        required: true,
+        default: null
     }
 
 })

@@ -62,7 +62,8 @@ export function loginUser(req, res) {
                     lastName: user.lastName,
                     role: user.role,
                     isDisabled: user.isDisable,
-                    isEmailVerified: user.isEmailVarified
+                    isEmailVerified: user.isEmailVarified,
+                    profilePicture: user.profilePicture
                 }
                 const token = jwt.sign(userData, process.env.JWT_KEY)
                 res.json({
@@ -99,12 +100,14 @@ export async function googleLogin(req, res) {
             email : response.data.email
         })
         if(user==null){
+        console.log(response.data)
             const newUser = new User({
                 email: response.data.email,
                 firstName: response.data.given_name,
                 lastName: response.data.family_name,
                 isEmailVarified: true,
-                password:accessToken
+                password:accessToken,
+                profilePicture:response.data.picture
             })
             await newUser.save()
 
@@ -112,6 +115,7 @@ export async function googleLogin(req, res) {
                 email: response.data.email,
                 firstName: response.data.given_name,
                 lastName: response.data.family_name,
+                profilePicture:response.data.picture,
                 role: "user",
                 phone:"not given",
                 isDisabled: false,
@@ -137,6 +141,7 @@ export async function googleLogin(req, res) {
                 lastName: user.lastName,
                 role: user.role,
                 phone:user.phone,
+                profilePicture:user.profilePicture,
                 isDisabled: user.isDisable,
                 isEmailVerified: user.isEmailVarified
             }
@@ -151,6 +156,7 @@ export async function googleLogin(req, res) {
 
     }
     catch (err) {
+        console.log(err)
         res.status(500).json(
             {
                 message: "error in google login"
