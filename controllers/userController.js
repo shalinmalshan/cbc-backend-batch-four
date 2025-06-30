@@ -27,16 +27,19 @@ export function saveUser(req, res) {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         password: hashedPassword,
+        profilePicture:"loginBackground3.jpeg",
         role: req.body.role
     }) 
 
 
     user.save().then(() => {
         res.json({
-            message: "User created successfully"
+            message: "User created successfully",
+            usercreated: true
         })
     }).catch(
-        () => {
+        (err) => {
+            console.log(err)
             res.status(500).json({
                 message: "User not created"
             })
@@ -100,7 +103,6 @@ export async function googleLogin(req, res) {
             email : response.data.email
         })
         if(user==null){
-        console.log(response.data)
             const newUser = new User({
                 email: response.data.email,
                 firstName: response.data.given_name,
@@ -127,6 +129,7 @@ export async function googleLogin(req, res) {
             const token = jwt.sign(userData, process.env.JWT_KEY)
             res.json({
                 message: "login successfull",
+                usercreated: true,
                 token: token,
                 user: userData
             })
@@ -148,6 +151,7 @@ export async function googleLogin(req, res) {
             const token = jwt.sign(userData, process.env.JWT_KEY)
             res.json({
                 message: "login successfull",
+                usercreated: false,
                 token: token,
                 user: userData
             })
@@ -272,4 +276,25 @@ export function deleteUser(req,res){
             })
         }
     )
+}
+
+export function getUserDetails(req,res){
+    if (req.user == null){
+        res.json({
+            user:null
+        })
+        return
+    }
+  res.json({
+    user:{
+        email: req.user.email,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        role: req.user.role,
+        phone:req.user.phone,
+        profilePicture:req.user.profilePicture,
+        isDisabled: req.user.isDisabled,
+        isEmailVerified: req.user.isEmailVerified
+    }
+  })
 }
